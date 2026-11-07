@@ -83,7 +83,19 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--oro);outline-offset
 .grupo{font-family:var(--display);font-size:18px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:6px}
 /* Juego */
 .juego{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
-.juego .cami{width:84px;height:84px}
+.cami img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;background:#e9edf5}
+.cami.foto b{position:absolute;right:0;bottom:0;font-size:15px;background:var(--azul);border-radius:8px 0 0 0;padding:0 5px;text-shadow:none;z-index:1}
+.cami.foto::before{display:none}
+.jug .cami{width:72px;height:72px}
+.juego .cami{width:120px;height:120px}
+.juego .cami.foto b{font-size:22px}
+.cuenta{display:flex;gap:10px;justify-content:center;margin:8px 0}
+.cuenta div{display:flex;flex-direction:column;align-items:center;min-width:56px}
+.cuenta b{font-family:var(--display);font-size:40px;color:var(--azul);line-height:1;font-variant-numeric:tabular-nums}
+.cuenta span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+.hora.tuya{background:var(--azul);color:#fff}
+.agendar{display:inline-flex;align-items:center;gap:6px;margin-top:4px;font:600 13px var(--body);color:var(--azul);background:var(--card);border:1px solid var(--azul);border-radius:999px;padding:5px 12px;text-decoration:none;cursor:pointer}
+.ev .agendar{grid-column:2;justify-self:start}
 .juego .cami b{font-size:40px}
 .pista{color:var(--muted);font-size:14px}
 .ops{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
@@ -160,15 +172,16 @@ footer{font-size:12px;color:var(--muted)}
 
   <section>
     <h2>Lo que viene</h2>
+    <div class="card hoy" id="cuenta" style="text-align:center"></div>
     <div class="card ev">
       <span class="dot oro"></span><h3>Copa Argentina · semi vs Banfield</h3>
       <div class="fecha">Sáb 14/11</div>
-      <div class="horas"><span class="hora">Argentina 19:00</span><span class="hora">Florida 17:00</span></div>
+      <div class="horas" data-utc="2026-11-14T22:00:00Z" data-tit="Boca vs Banfield · Semifinal Copa Argentina" data-lugar="Estadio Malvinas Argentinas, Mendoza"><span class="hora">Argentina 19:00</span><span class="hora">Florida 17:00</span></div>
     </div>
     <div class="card ev">
       <span class="dot oro"></span><h3>Sudamericana · FINAL vs Atlético Mineiro</h3>
       <div class="fecha">Sáb 21/11</div>
-      <div class="horas"><span class="hora">Argentina 19:30</span><span class="hora">Florida 17:30</span></div>
+      <div class="horas" data-utc="2026-11-21T22:30:00Z" data-tit="Boca vs Atlético Mineiro · Final Copa Sudamericana" data-lugar="Estadio Metropolitano Roberto Meléndez, Barranquilla"><span class="hora">Argentina 19:30</span><span class="hora">Florida 17:30</span></div>
     </div>
     <p class="sub">Detalle y fuentes en la pestaña Calendario.</p>
   </section>
@@ -213,7 +226,7 @@ footer{font-size:12px;color:var(--muted)}
       <span class="dot oro"></span><h3>Copa Argentina · semifinal vs Banfield</h3>
       <div class="fecha">Sáb 14/11</div>
       <div class="det">Estadio Malvinas Argentinas, Mendoza. Si pasa, la final es contra Platense (lo dirige Martín Palermo) el miércoles 02/12. Hora y estadio de la final, sin confirmar.</div>
-      <div class="horas"><span class="hora">Argentina 19:00</span><span class="hora">Florida 17:00</span></div>
+      <div class="horas" data-utc="2026-11-14T22:00:00Z" data-tit="Boca vs Banfield · Semifinal Copa Argentina" data-lugar="Estadio Malvinas Argentinas, Mendoza"><span class="hora">Argentina 19:00</span><span class="hora">Florida 17:00</span></div>
       <div class="fuente">Fuentes: <a href="https://diariopanorama.com/noticia/569991/copa-argentina-confirmaron-donde-se-jugara-semifinal-entre-boca-banfield-cuando-sera-partido" target="_blank" rel="noopener">Diario Panorama</a> (semi), <a href="https://442.perfil.com/noticias/futbol/final-de-la-copa-argentina-2026-cuando-es-donde-y-quienes-la-jugaran.phtml" target="_blank" rel="noopener">442</a> (final), <a href="https://442.perfil.com/noticias/futbol/martin-palermo-llevo-a-platense-a-la-final-de-la-copa-argentina-y-palpito-un-posible-cruce-con-boca.phtml" target="_blank" rel="noopener">442</a> (Palermo)</div>
     </div>
 
@@ -221,7 +234,7 @@ footer{font-size:12px;color:var(--muted)}
       <span class="dot oro"></span><h3>Copa Sudamericana · final vs Atlético Mineiro</h3>
       <div class="fecha">Sáb 21/11</div>
       <div class="det">Partido único en el Estadio Metropolitano Roberto Meléndez, Barranquilla (Colombia).</div>
-      <div class="horas"><span class="hora">Argentina 19:30</span><span class="hora">Colombia 17:30</span><span class="hora">Florida 17:30</span></div>
+      <div class="horas" data-utc="2026-11-21T22:30:00Z" data-tit="Boca vs Atlético Mineiro · Final Copa Sudamericana" data-lugar="Estadio Metropolitano Roberto Meléndez, Barranquilla"><span class="hora">Argentina 19:30</span><span class="hora">Colombia 17:30</span><span class="hora">Florida 17:30</span></div>
       <div class="fuente">Fuente: <a href="https://www.ntn24.com/noticias-deportes/conmebol-cambia-horario-final-copa-sudamericana-2026-boca-juniors-atletico-mineiro-jugara-barranquilla-663022" target="_blank" rel="noopener">NTN24</a> (31/10)</div>
     </div>
 
@@ -261,9 +274,9 @@ footer{font-size:12px;color:var(--muted)}
 <div class="vista" id="v-juego" hidden>
   <section>
     <h2>¿Quién es?</h2>
-    <p class="sub">Para aprenderte el plantel: te doy la camiseta y una pista, vos elegís el jugador.</p>
+    <p class="sub">Para aprenderte el plantel: te muestro la cara, el número y una pista, vos elegís quién es.</p>
     <div class="card juego" id="juego">
-      <div class="cami"><b id="j-num">0</b></div>
+      <div id="j-cami"></div>
       <div class="pista" id="j-pista">Cargando…</div>
       <div class="ops" id="j-ops"></div>
       <button class="btn" id="j-sig" type="button">Otro</button>
@@ -373,6 +386,12 @@ const P = [
   [28,"Adam Bareiro","DEL",30,"Paraguay",""],
   [44,"Rodrigo Bacidalupe","DEL",19,"Argentina",""]
 ];
+const FOTO = {12:177230,30:5903,1:2481,3:289444,32:288750,2:369412,4:6082,24:414484,42:560376,17:51332,26:212842,46:606034,15:11424,10:510587,25:26305,6:1484,8:6209,40:628475,27:5791,7:11463,18:459876,5:271,23:414378,53:492746,20:6092,11:2521,44:560377,28:35551,19:510586,9:59229,16:6327,13:35533,22:2494};
+function cami(p){
+  const id = FOTO[p[0]];
+  if (!id) return `<div class="cami" aria-hidden="true"><b>${p[0]}</b></div>`;
+  return `<div class="cami foto"><img src="https://media.api-sports.io/football/players/${id}.png" alt="Foto de ${esc(p[1])}" loading="lazy" onerror="this.parentNode.classList.remove('foto');this.remove()"><b>${p[0]}</b></div>`;
+}
 const NOM = {ARQ:"Arqueros",DEF:"Defensores",MED:"Mediocampistas",DEL:"Delanteros"};
 const PUESTO1 = {ARQ:"Arquero",DEF:"Defensor",MED:"Mediocampista",DEL:"Delantero"};
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -385,7 +404,7 @@ function pintarPlantel(f){
     const js = P.filter(p => p[2] === g).sort((a,b) => a[0]-b[0]);
     html += `<div class="grupo">${NOM[g]}</div><div class="grid">` + js.map(p => `
       <div class="card jug">
-        <div class="cami" aria-hidden="true"><b>${p[0]}</b></div>
+        ${cami(p)}
         <a class="nom" href="${ESPN(p[1])}" target="_blank" rel="noopener">${esc(p[1])}</a>
         <div class="dat">${p[3] ? p[3] + " años · " : ""}${esc(p[4])}</div>
         ${p[5] ? `<span class="dato">${esc(p[5])}</span>` : ""}
@@ -405,7 +424,7 @@ function mezclar(a){ a = a.slice(); for (let i = a.length - 1; i > 0; i--){ cons
 function nueva(){
   resp = false;
   actual = P[Math.floor(Math.random()*P.length)];
-  document.getElementById("j-num").textContent = actual[0];
+  document.getElementById("j-cami").innerHTML = cami(actual);
   document.getElementById("j-pista").textContent = `${PUESTO1[actual[2]]} · ${actual[4]}${actual[3] ? " · " + actual[3] + " años" : ""}`;
   const mismos = P.filter(p => p !== actual && p[2] === actual[2]);
   const otros = mezclar(mismos.length >= 3 ? mismos : P.filter(p => p !== actual)).slice(0,3);
@@ -426,6 +445,46 @@ function nueva(){
 }
 document.getElementById("j-sig").addEventListener("click", nueva);
 nueva();
+
+// Hora del celu, agendar y cuenta regresiva
+const fmtH = d => d.toLocaleTimeString("es-AR",{hour:"2-digit",minute:"2-digit"});
+const zona = (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch(e){ return ""; } })();
+const zonaCorta = zona.includes("Argentina") ? "" : (zona.split("/").pop() || "").replace(/_/g," ");
+function ics(t, tit, lugar){
+  const f = d => d.toISOString().replace(/[-:]/g,"").replace(/\.\d{3}/,"");
+  const a = new Date(t), b = new Date(a.getTime() + 2*3600e3);
+  const txt = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Tablero Boca//ES","BEGIN:VEVENT","UID:" + f(a) + "@tablero-boca","DTSTAMP:" + f(new Date()),"DTSTART:" + f(a),"DTEND:" + f(b),"SUMMARY:" + tit,"LOCATION:" + lugar,"BEGIN:VALARM","TRIGGER:-PT1H","ACTION:DISPLAY","DESCRIPTION:" + tit,"END:VALARM","END:VEVENT","END:VCALENDAR"].join("\r\n");
+  return "data:text/calendar;charset=utf-8," + encodeURIComponent(txt);
+}
+document.querySelectorAll(".horas[data-utc]").forEach(h => {
+  const d = new Date(h.dataset.utc);
+  if (zonaCorta){
+    const s = document.createElement("span"); s.className = "hora tuya";
+    s.textContent = "En tu celu: " + fmtH(d); h.prepend(s);
+  }
+  if (d > new Date()){
+    const a = document.createElement("a"); a.className = "agendar";
+    a.href = ics(h.dataset.utc, h.dataset.tit, h.dataset.lugar);
+    a.download = "boca.ics"; a.textContent = "+ Agendar en el calendario";
+    h.after(a);
+  }
+});
+const PARTIDOS = [...new Set([...document.querySelectorAll(".horas[data-utc]")].map(h => h.dataset.utc + "|" + h.dataset.tit))]
+  .map(x => { const [t, tit] = x.split("|"); return {t: new Date(t), tit}; }).sort((a,b) => a.t - b.t);
+function cuenta(){
+  const el = document.getElementById("cuenta"); if (!el) return;
+  const prox = PARTIDOS.find(p => p.t > new Date());
+  if (!prox){ el.hidden = true; return; }
+  let ms = prox.t - new Date();
+  const dd = Math.floor(ms/864e5); ms -= dd*864e5;
+  const hh = Math.floor(ms/36e5); ms -= hh*36e5;
+  const mm = Math.floor(ms/6e4);
+  const dia = prox.t.toLocaleDateString("es-AR",{weekday:"long",day:"numeric",month:"numeric"});
+  el.innerHTML = `<div class="sub">Falta para</div><h3>${prox.tit}</h3>
+    <div class="cuenta"><div><b>${dd}</b><span>días</span></div><div><b>${hh}</b><span>horas</span></div><div><b>${mm}</b><span>min</span></div></div>
+    <div class="sub">${dia} · ${fmtH(prox.t)} en tu celu</div>`;
+}
+cuenta(); setInterval(cuenta, 30000);
 
 // Pestañas
 const VISTAS = ["hoy","calendario","plantel","juego","titulos"];
