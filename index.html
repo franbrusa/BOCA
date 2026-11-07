@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#0b2f6b">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="favicon-32.png">
+<link rel="manifest" href="manifest.webmanifest">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Tablero Boca</title>
+<meta name="apple-mobile-web-app-title" content="Boca">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: app de una columna con barra de pestañas abajo (como app de celu). Look claro fijo, pedido de Francisco: blanco, minimal, bolitas de color, azul y oro. */
+:root{
+  --bg:#f5f6f9; --card:#ffffff; --fg:#121829; --muted:#5b6375; --line:#e2e5ed;
+  --azul:#0b2f6b; --azul2:#163f86; --oro:#f2b705; --oro-suave:#fff5d6;
+  --vivo:#d93a2b; --ok:#2f9e5b; --espera:#8a93a6;
+  --display:"Barlow Condensed","Arial Narrow",sans-serif;
+  --body:"Figtree",-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.5}
+.top{background:var(--azul);color:#fff;padding-block:18px 14px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.top-in{max-width:760px;margin:0 auto;display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.top h1{font-family:var(--display);font-size:36px;line-height:1;margin:0;letter-spacing:.5px}
+.top h1 span{color:var(--oro)}
+.marca{display:flex;align-items:center;gap:12px}
+.escudo{width:48px;height:48px;border-radius:12px;flex:none}
+.top .act{font-size:12px;opacity:.85}
+.franja{height:8px;background:var(--oro)}
+main{max-width:760px;margin:0 auto;padding-block:20px 110px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.vista{display:flex;flex-direction:column;gap:22px}
+h2{font-family:var(--display);font-size:22px;margin:0;color:var(--azul);letter-spacing:.4px;text-transform:uppercase}
+h3{margin:0;font-size:16px}
+section{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;min-width:0}
+.hoy{border:2px solid var(--azul)}
+.sub{color:var(--muted);font-size:13px;margin:0}
+.marcador{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;text-align:center}
+.eq{font-weight:600}
+.goles{font-family:var(--display);font-size:52px;color:var(--azul);font-variant-numeric:tabular-nums;line-height:1}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--bg);color:var(--muted)}
+.dot{width:9px;height:9px;border-radius:50%;flex:none;background:var(--espera);display:inline-block}
+.dot.vivo{background:var(--vivo)} .dot.ok{background:var(--ok)} .dot.oro{background:var(--oro)}
+.centro{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-top:10px}
+.meta{font-size:13px;color:var(--muted);text-align:center;margin-top:8px}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:14px}
+th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line)}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);font-weight:600}
+td.n,th.n{text-align:right}
+tr.boca td{font-weight:700;color:var(--azul)}
+.scroll{overflow-x:auto}
+ul.lista{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px}
+.ev{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;align-items:start}
+.ev .dot{margin-top:7px}
+.fecha{font-family:var(--display);font-size:20px;letter-spacing:.3px}
+.ev .det,.ev .horas,.ev .fuente{grid-column:2}
+.det{color:var(--muted);font-size:14px}
+.horas{display:flex;flex-wrap:wrap;gap:6px}
+.hora{font-size:12px;background:var(--oro-suave);color:var(--azul);padding:2px 8px;border-radius:6px;font-weight:600}
+.fuente{font-size:12px;color:var(--muted)}
+a{color:var(--azul2)}
+a:focus-visible,button:focus-visible{outline:2px solid var(--oro);outline-offset:2px}
+.nota{background:var(--oro-suave);border-color:#efdca0}
+/* Plantel */
+.filtros{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:999px;padding:6px 12px;font:600 13px var(--body);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--azul);color:#fff;border-color:var(--azul)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+.jug{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.cami{width:56px;height:56px;border-radius:50%;background:var(--azul);position:relative;overflow:hidden;display:grid;place-items:center;flex:none}
+.cami::before{content:"";position:absolute;left:0;right:0;top:38%;height:24%;background:var(--oro)}
+.cami b{position:relative;font-family:var(--display);font-size:26px;color:#fff;text-shadow:0 1px 0 var(--azul),0 -1px 0 var(--azul),1px 0 0 var(--azul),-1px 0 0 var(--azul)}
+.jug .nom{font-weight:700;line-height:1.25}
+.jug .dat{font-size:13px;color:var(--muted)}
+.jug .dato{font-size:12px;background:var(--oro-suave);color:var(--azul);border-radius:6px;padding:2px 7px}
+.grupo{font-family:var(--display);font-size:18px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:6px}
+/* Juego */
+.juego{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
+.juego .cami{width:84px;height:84px}
+.juego .cami b{font-size:40px}
+.pista{color:var(--muted);font-size:14px}
+.ops{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+.op{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:10px;font:600 14px var(--body);cursor:pointer;color:var(--fg)}
+.op.bien{background:#e3f4ea;border-color:var(--ok)}
+.op.mal{background:#fbe5e2;border-color:var(--vivo)}
+.btn{background:var(--azul);color:#fff;border:0;border-radius:10px;padding:10px 18px;font:700 14px var(--body);cursor:pointer}
+.score{font-size:13px;color:var(--muted)}
+/* Títulos */
+.vitrina{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.copa{display:flex;flex-direction:column;gap:2px}
+.copa .num{font-family:var(--display);font-size:40px;color:var(--azul);line-height:1}
+.copa .anos{font-size:12px;color:var(--muted)}
+/* Barra de pestañas */
+nav{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.96);border-top:1px solid var(--line);backdrop-filter:blur(10px);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:max(8px,env(safe-area-inset-left,0px));padding-right:max(8px,env(safe-area-inset-right,0px));z-index:5}
+nav .in{max-width:760px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
+nav a{display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 2px 8px;text-decoration:none;color:var(--muted);font-size:11px;font-weight:600}
+nav a svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav a[aria-current="page"]{color:var(--azul)}
+footer{font-size:12px;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.op,.chip{transition:background .15s,border-color .15s}}
+</style>
+</head>
+<body>
+
+
+<div class="top"><div class="top-in">
+  <div class="marca"><img class="escudo" alt="Escudo de Boca" src="data:image/png;base64,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"><h1>Tablero <span>Boca</span></h1></div>
+  <div class="act">Actualizado: sáb 07/11/2026 · 17:50 (hora Argentina)</div>
+</div></div>
+<div class="franja"></div>
+
+<main>
+
+<!-- ============ HOY ============ -->
+<div class="vista" id="v-hoy">
+  <section>
+    <h2>Hoy · Clausura, fecha 16</h2>
+    <div class="card hoy">
+      <div class="marcador">
+        <div class="eq">Boca Juniors</div>
+        <div class="goles">0 – 0</div>
+        <div class="eq">Defensa y Justicia</div>
+      </div>
+      <div class="centro">
+        <span class="pill"><span class="dot vivo"></span>En juego · parcial a las 17:40</span>
+        <span class="pill">La Bombonera · 17:30</span>
+      </div>
+      <div class="meta">Parciales de los rivales a esa hora: Argentinos 0–1 Huracán · Rosario Central 0–0 Estudiantes (RC). No es resultado final. Fuente: <a href="https://www.losandes.com.ar/deportes/boca-empata-defensa-y-justicia-y-suena-el-titulo-anual-la-liga-profesional-n6013329" target="_blank" rel="noopener">Los Andes</a></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Tabla anual</h2>
+    <div class="card">
+      <p class="sub" style="margin-bottom:6px">Antes de la última fecha</p>
+      <div class="scroll"><table>
+        <thead><tr><th>Equipo</th><th class="n">Pts</th><th class="n">Dif. gol</th></tr></thead>
+        <tbody>
+          <tr class="boca"><td>Boca Juniors</td><td class="n">60</td><td class="n">+22</td></tr>
+          <tr><td>Argentinos Juniors</td><td class="n">60</td><td class="n">+12</td></tr>
+          <tr><td>Rosario Central</td><td class="n">59</td><td class="n">+16</td></tr>
+        </tbody>
+      </table></div>
+      <p style="margin:14px 0 6px"><strong>Qué necesita Boca para ser campeón</strong></p>
+      <ul class="lista">
+        <li><b>Si gana:</b> campeón (salvo que Argentinos le descuente 11 goles de diferencia).</li>
+        <li><b>Si empata:</b> necesita que no ganen ni Argentinos ni Central.</li>
+        <li><b>Si pierde:</b> necesita que pierda Argentinos y que Central no gane.</li>
+      </ul>
+      <p class="sub" style="margin-top:8px">Fuentes: <a href="https://www.c5n.com/deportes/liga-profesional-campeon-tabla-anual-boca-argentinos-rosario-central-sabado-7-noviembre-2026" target="_blank" rel="noopener">C5N</a>, <a href="https://www.eldestapeweb.com/deportes/necesita-boca-salir-campeon-tabla-anual-202611717290" target="_blank" rel="noopener">El Destape</a>.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Lo que viene</h2>
+    <div class="card ev">
+      <span class="dot oro"></span><h3>Copa Argentina · semi vs Banfield</h3>
+      <div class="fecha">Sáb 14/11</div>
+      <div class="horas"><span class="hora">Argentina 19:00</span><span class="hora">Florida 17:00</span></div>
+    </div>
+    <div class="card ev">
+      <span class="dot oro"></span><h3>Sudamericana · FINAL vs Atlético Mineiro</h3>
+      <div class="fecha">Sáb 21/11</div>
+      <div class="horas"><span class="hora">Argentina 19:30</span><span class="hora">Florida 17:30</span></div>
+    </div>
+    <p class="sub">Detalle y fuentes en la pestaña Calendario.</p>
+  </section>
+
+  <section>
+    <h2>Cómo viene el año</h2>
+    <div class="card">
+      <ul class="lista">
+        <li>Arrancó el año con Claudio Úbeda de DT. Lo echaron el 2 de junio y el 18 de junio asumió <b>Rodolfo Arruabarrena</b>.</li>
+        <li>Apertura: quedó afuera en octavos, perdió 2–3 con Huracán en la Bombonera (9 de mayo).</li>
+        <li>Libertadores: terminó 3º en su grupo y pasó a la Sudamericana.</li>
+        <li>Sudamericana: eliminó a O'Higgins (por penales), Recoleta, São Paulo y Vasco da Gama en el Maracaná, con un golazo de Paredes al final. Está en la final.</li>
+        <li>Copa Argentina: le ganó a Gimnasia (Chivilcoy), Sarmiento (Junín), Vélez (por penales) y Racing. Está en semis.</li>
+        <li>En julio llegaron Álvaro Montero y Sebastián Villa; Lucas Janson se fue a préstamo a Gimnasia (LP).</li>
+      </ul>
+      <p class="sub" style="margin-top:8px">Fuentes: <a href="https://en.wikipedia.org/wiki/2026_Club_Atl%C3%A9tico_Boca_Juniors_season" target="_blank" rel="noopener">Wikipedia, temporada 2026 de Boca</a> (al 20/09), <a href="https://diariopanorama.com/noticia/570168/boca-finalista-con-golazo-agonico-paredes-xeneize-se-hizo-fuerte-maracana-elimino-vasco-da-gama" target="_blank" rel="noopener">Diario Panorama</a> (Vasco), <a href="https://eleconomista.com.ar/deportes/boca-racing-cuando-juegan-cuartos-final-copa-argentina-2026-n97906" target="_blank" rel="noopener">El Economista</a> (Racing).</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="card nota">
+      <strong>Ojo con lo que dijo Google hoy.</strong> Decía que con un empate Boca es campeón "si Argentinos no gana", pero tampoco tiene que ganar Central. Y hablaba de 4 títulos en juego: son 5, contando el Trofeo de Campeones.
+    </div>
+  </section>
+</div>
+
+<!-- ============ CALENDARIO ============ -->
+<div class="vista" id="v-calendario" hidden>
+  <section>
+    <h2>Los 5 títulos en juego</h2>
+    <p class="sub">La hora de Florida es una cuenta mía: en noviembre allá son 2 horas menos que en Argentina.</p>
+
+    <div class="card ev">
+      <span class="dot vivo"></span><h3>Tabla Anual 2026 (Campeón de Liga)</h3>
+      <div class="fecha">Hoy, sáb 07/11</div>
+      <div class="det">Se define con la última fecha del Clausura. El que suma más puntos en todo el año es Campeón de Liga.</div>
+      <div class="horas"><span class="hora">Argentina 17:30</span><span class="hora">Florida 15:30</span></div>
+      <div class="fuente">Fuente: <a href="https://www.c5n.com/deportes/liga-profesional-campeon-tabla-anual-boca-argentinos-rosario-central-sabado-7-noviembre-2026" target="_blank" rel="noopener">C5N</a></div>
+    </div>
+
+    <div class="card ev">
+      <span class="dot oro"></span><h3>Copa Argentina · semifinal vs Banfield</h3>
+      <div class="fecha">Sáb 14/11</div>
+      <div class="det">Estadio Malvinas Argentinas, Mendoza. Si pasa, la final es contra Platense (lo dirige Martín Palermo) el miércoles 02/12. Hora y estadio de la final, sin confirmar.</div>
+      <div class="horas"><span class="hora">Argentina 19:00</span><span class="hora">Florida 17:00</span></div>
+      <div class="fuente">Fuentes: <a href="https://diariopanorama.com/noticia/569991/copa-argentina-confirmaron-donde-se-jugara-semifinal-entre-boca-banfield-cuando-sera-partido" target="_blank" rel="noopener">Diario Panorama</a> (semi), <a href="https://442.perfil.com/noticias/futbol/final-de-la-copa-argentina-2026-cuando-es-donde-y-quienes-la-jugaran.phtml" target="_blank" rel="noopener">442</a> (final), <a href="https://442.perfil.com/noticias/futbol/martin-palermo-llevo-a-platense-a-la-final-de-la-copa-argentina-y-palpito-un-posible-cruce-con-boca.phtml" target="_blank" rel="noopener">442</a> (Palermo)</div>
+    </div>
+
+    <div class="card ev">
+      <span class="dot oro"></span><h3>Copa Sudamericana · final vs Atlético Mineiro</h3>
+      <div class="fecha">Sáb 21/11</div>
+      <div class="det">Partido único en el Estadio Metropolitano Roberto Meléndez, Barranquilla (Colombia).</div>
+      <div class="horas"><span class="hora">Argentina 19:30</span><span class="hora">Colombia 17:30</span><span class="hora">Florida 17:30</span></div>
+      <div class="fuente">Fuente: <a href="https://www.ntn24.com/noticias-deportes/conmebol-cambia-horario-final-copa-sudamericana-2026-boca-juniors-atletico-mineiro-jugara-barranquilla-663022" target="_blank" rel="noopener">NTN24</a> (31/10)</div>
+    </div>
+
+    <div class="card ev">
+      <span class="dot"></span><h3>Torneo Clausura · playoffs</h3>
+      <div class="fecha">Octavos: fecha a confirmar</div>
+      <div class="det">Ya está en octavos. El rival sale al cerrar la fecha 16. Al 03/11 era 2º de la Zona A con 30 puntos, detrás de Instituto (33). La final del Clausura es a más tardar el 12/12.</div>
+      <div class="fuente">Fuentes: <a href="https://eleconomista.com.ar/deportes/como-serian-hoy-cruces-octavos-final-torneo-clausura-2026-n99418" target="_blank" rel="noopener">El Economista</a>, <a href="https://en.wikipedia.org/wiki/2026_AFA_Liga_Profesional_de_F%C3%BAtbol" target="_blank" rel="noopener">Wikipedia, Liga 2026</a></div>
+    </div>
+
+    <div class="card ev">
+      <span class="dot"></span><h3>Trofeo de Campeones</h3>
+      <div class="fecha">Solo si gana el Clausura</div>
+      <div class="det">Lo jugaría contra Belgrano de Córdoba, campeón del Apertura. Fecha sin definir.</div>
+      <div class="fuente">Fuente: <a href="https://442.perfil.com/noticias/futbol/los-titulos-que-boca-juniors-puede-ganar-en-2026.phtml" target="_blank" rel="noopener">442 Perfil</a></div>
+    </div>
+  </section>
+</div>
+
+<!-- ============ PLANTEL ============ -->
+<div class="vista" id="v-plantel" hidden>
+  <section>
+    <h2>Plantel 2026</h2>
+    <p class="sub">DT: Rodolfo Arruabarrena. Número de camiseta y puesto según <a href="https://revistasoloboca.com.ar/plantel/" target="_blank" rel="noopener">Revista Solo Boca</a>; edad y país según <a href="https://www.espn.com/soccer/team/squad/_/id/5/league/CONMEBOL.LIBERTADORES/season/2026" target="_blank" rel="noopener">ESPN</a>. Tocá un nombre para ver sus fotos.</p>
+    <div class="filtros" role="group" aria-label="Filtrar por puesto">
+      <button class="chip" data-f="todos" aria-pressed="true">Todos</button>
+      <button class="chip" data-f="ARQ" aria-pressed="false">Arqueros</button>
+      <button class="chip" data-f="DEF" aria-pressed="false">Defensores</button>
+      <button class="chip" data-f="MED" aria-pressed="false">Mediocampistas</button>
+      <button class="chip" data-f="DEL" aria-pressed="false">Delanteros</button>
+    </div>
+    <div id="plantel"></div>
+  </section>
+</div>
+
+<!-- ============ JUEGO ============ -->
+<div class="vista" id="v-juego" hidden>
+  <section>
+    <h2>¿Quién es?</h2>
+    <p class="sub">Para aprenderte el plantel: te doy la camiseta y una pista, vos elegís el jugador.</p>
+    <div class="card juego" id="juego">
+      <div class="cami"><b id="j-num">0</b></div>
+      <div class="pista" id="j-pista">Cargando…</div>
+      <div class="ops" id="j-ops"></div>
+      <button class="btn" id="j-sig" type="button">Otro</button>
+      <div class="score" id="j-score">Aciertos: 0 de 0</div>
+    </div>
+  </section>
+</div>
+
+<!-- ============ TÍTULOS / APRENDER ============ -->
+<div class="vista" id="v-titulos" hidden>
+  <section>
+    <h2>Vitrina internacional</h2>
+    <p class="sub">18 títulos internacionales. Fuente: <a href="https://futdados.com/arg/todos-los-titulos-de-boca-historia/" target="_blank" rel="noopener">Futdados</a> (actualizado 21/08/2026).</p>
+    <div class="vitrina">
+      <div class="card copa"><span class="num">6</span><b>Copa Libertadores</b><span class="anos">1977, 1978, 2000, 2001, 2003, 2007</span></div>
+      <div class="card copa"><span class="num">3</span><b>Intercontinental</b><span class="anos">1977, 2000, 2003</span></div>
+      <div class="card copa"><span class="num">2</span><b>Copa Sudamericana</b><span class="anos">2004, 2005</span></div>
+      <div class="card copa"><span class="num">4</span><b>Recopa Sudamericana</b><span class="anos">1990, 2005, 2006, 2008</span></div>
+      <div class="card copa"><span class="num">1</span><b>Supercopa Sudamericana</b><span class="anos">1989</span></div>
+      <div class="card copa"><span class="num">1</span><b>Copa Máster de Supercopa</b><span class="anos">1992</span></div>
+      <div class="card copa"><span class="num">1</span><b>Copa de Oro</b><span class="anos">1993</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>En Argentina</h2>
+    <div class="card">
+      <ul class="lista">
+        <li><b>Total oficial:</b> 74 títulos si se cuenta también la era amateur (así lo cuentan <a href="https://www.goal.com/es-mx/noticias/todos-los-titulos-en-la-historia-de-boca/1hkccw7ce63c514c36gzagq9cj" target="_blank" rel="noopener">Goal</a> y El Gráfico), o 55 si se cuenta solo la era profesional (<a href="https://futdados.com/arg/todos-los-titulos-de-boca-historia/" target="_blank" rel="noopener">Futdados</a>).</li>
+        <li><b>Ligas de Primera, era profesional:</b> 29, la última en 2022.</li>
+        <li><b>Copa Argentina:</b> 4 (1969, 2011-12, 2014-15, 2019-20).</li>
+        <li><b>Copa de la Liga:</b> 2 (2020, 2022). <b>Supercopa Argentina:</b> 2 (2018, 2022).</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Para entender las competiciones</h2>
+    <div class="card"><h3>Apertura y Clausura</h3><p class="sub" style="margin-top:4px">La liga tiene dos torneos por año. 30 equipos en dos zonas de 15; los 8 mejores de cada zona juegan playoffs a partido único hasta la final. El Apertura 2026 lo ganó Belgrano (3–2 a River en la final, 24/05).</p></div>
+    <div class="card"><h3>Tabla Anual = Campeón de Liga</h3><p class="sub" style="margin-top:4px">Suma los puntos de los dos torneos. El que termina primero es Campeón de Liga. También reparte lugares para la Libertadores y la Sudamericana del año siguiente.</p></div>
+    <div class="card"><h3>Trofeo de Campeones</h3><p class="sub" style="margin-top:4px">Un partido entre los campeones del año. Boca lo juega solo si gana el Clausura.</p></div>
+    <div class="card"><h3>Copa Argentina</h3><p class="sub" style="margin-top:4px">Copa por eliminación directa con equipos de todas las categorías. El campeón va a la Libertadores.</p></div>
+    <div class="card"><h3>Libertadores y Sudamericana</h3><p class="sub" style="margin-top:4px">Las dos copas de clubes de Sudamérica (Conmebol). La Libertadores es la más importante. El que sale 3º en su grupo de Libertadores pasa a la Sudamericana, que es lo que le pasó a Boca este año.</p></div>
+    <p class="sub">Fuente del formato: <a href="https://en.wikipedia.org/wiki/2026_AFA_Liga_Profesional_de_F%C3%BAtbol" target="_blank" rel="noopener">Wikipedia, Liga Profesional 2026</a>.</p>
+  </section>
+
+  <section>
+    <h2>El club</h2>
+    <div class="card">
+      <ul class="lista">
+        <li><b>Fundado:</b> 3 de abril de 1905, en La Boca.</li>
+        <li><b>Estadio:</b> Alberto J. Armando, "La Bombonera".</li>
+        <li><b>Presidente:</b> Juan Román Riquelme (<a href="https://elgrafico.com.ar/articulo/la-jornada-esta-aqui/72599/se-realizo-el-traspaso-de-mando-y-riquelme-es-el-nuevo-presidente-de-boca" target="_blank" rel="noopener">El Gráfico</a>).</li>
+        <li><b>DT:</b> Rodolfo "Vasco" Arruabarrena, en su segundo ciclo (<a href="https://www.primicias.ec/deportes/futbol/boca-juniors-posibilidad-ganar-cinco-titulos-copa-sudamericana-arruabarrena-135517/" target="_blank" rel="noopener">Primicias</a>).</li>
+      </ul>
+      <p class="sub" style="margin-top:8px">Fundación y estadio: <a href="https://en.wikipedia.org/wiki/Club_Atl%C3%A9tico_Boca_Juniors" target="_blank" rel="noopener">Wikipedia</a>.</p>
+    </div>
+  </section>
+</div>
+
+<footer style="margin-top:28px">Página de un hincha, no oficial. Se actualiza todos los días y cada dato lleva su fuente.</footer>
+</main>
+
+<nav aria-label="Secciones"><div class="in">
+  <a href="#hoy" data-v="hoy"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Hoy</a>
+  <a href="#calendario" data-v="calendario"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Calendario</a>
+  <a href="#plantel" data-v="plantel"><svg viewBox="0 0 24 24"><path d="M8 3l-5 3 2 5 2-1v11h10V10l2 1 2-5-5-3c-.5 1.5-2 2.5-4 2.5S8.5 4.5 8 3z"/></svg>Plantel</a>
+  <a href="#juego" data-v="juego"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17h.01"/></svg>¿Quién es?</a>
+  <a href="#titulos" data-v="titulos"><svg viewBox="0 0 24 24"><path d="M8 4h8v5a4 4 0 0 1-8 0V4zM8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8.5 20h7M10 17h4"/></svg>Títulos</a>
+</div></nav>
+
+<script>
+const ESPN = q => "https://www.google.com/search?tbm=isch&q=" + encodeURIComponent(q + " Boca Juniors 2026");
+const P = [
+  // [num, nombre, puesto, edad, país, dato]
+  [1,"Álvaro Montero","ARQ",31,"Colombia","Llegó en julio desde Vélez"],
+  [12,"Leandro Brey","ARQ",24,"Argentina",""],
+  [30,"Javier García","ARQ",39,"Argentina",""],
+  [2,"Lautaro Di Lollo","DEF",22,"Argentina",""],
+  [3,"Lautaro Blanco","DEF",27,"Argentina",""],
+  [4,"Nicolás Figal","DEF",32,"Argentina",""],
+  [17,"Leandro Lozano","DEF",27,"Uruguay","Llegó desde Argentinos"],
+  [24,"Dylan Gorosito","DEF",20,"Argentina",""],
+  [26,"Marco Pellegrino","DEF",24,"Argentina",""],
+  [32,"Ayrton Costa","DEF",27,"Argentina",""],
+  [42,"Facundo Herrera","DEF",20,"Argentina",""],
+  [46,"Matías Satas","DEF",18,"Argentina",""],
+  [5,"Leandro Paredes","MED",32,"Argentina","Golazo en el Maracaná para la final"],
+  [6,"Rodrigo Battaglia","MED",35,"Argentina",""],
+  [7,"Carlos Palacios","MED",26,"Chile",""],
+  [8,"Tomás Belmonte","MED",28,"Argentina",""],
+  [10,"Tomás Aranda","MED",19,"Argentina",""],
+  [15,"William Alarcón","MED",25,"Chile",""],
+  [18,"Milton Delgado","MED",21,"Argentina",""],
+  [20,"Alan Velasco","MED",24,"Argentina",""],
+  [23,"Camilo Rey","MED",20,"Argentina",""],
+  [25,"Santiago Ascacíbar","MED",29,"Argentina","2º goleador del año al 20/09 (8)"],
+  [27,"Malcom Braida","MED",29,"Argentina",""],
+  [40,"Lautaro Bianco","MED",null,"Argentina",""],
+  [53,"Joaquín Ruiz","MED",20,"Argentina",""],
+  [9,"Milton Giménez","DEL",30,"Argentina",""],
+  [11,"Ángel Romero","DEL",34,"Paraguay",""],
+  [13,"Enner Valencia","DEL",37,"Ecuador",""],
+  [16,"Miguel Merentiel","DEL",30,"Uruguay","Goleador del año al 20/09 (12)"],
+  [19,"Leonel Flores","DEL",19,"Argentina",""],
+  [22,"Sebastián Villa","DEL",30,"Colombia","Llegó en julio desde Independiente Rivadavia"],
+  [28,"Adam Bareiro","DEL",30,"Paraguay",""],
+  [44,"Rodrigo Bacidalupe","DEL",19,"Argentina",""]
+];
+const NOM = {ARQ:"Arqueros",DEF:"Defensores",MED:"Mediocampistas",DEL:"Delanteros"};
+const PUESTO1 = {ARQ:"Arquero",DEF:"Defensor",MED:"Mediocampista",DEL:"Delantero"};
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function pintarPlantel(f){
+  const cont = document.getElementById("plantel");
+  let html = "";
+  for (const g of ["ARQ","DEF","MED","DEL"]){
+    if (f !== "todos" && f !== g) continue;
+    const js = P.filter(p => p[2] === g).sort((a,b) => a[0]-b[0]);
+    html += `<div class="grupo">${NOM[g]}</div><div class="grid">` + js.map(p => `
+      <div class="card jug">
+        <div class="cami" aria-hidden="true"><b>${p[0]}</b></div>
+        <a class="nom" href="${ESPN(p[1])}" target="_blank" rel="noopener">${esc(p[1])}</a>
+        <div class="dat">${p[3] ? p[3] + " años · " : ""}${esc(p[4])}</div>
+        ${p[5] ? `<span class="dato">${esc(p[5])}</span>` : ""}
+      </div>`).join("") + `</div>`;
+  }
+  cont.innerHTML = html;
+}
+document.querySelectorAll(".chip").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll(".chip").forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
+  pintarPlantel(b.dataset.f);
+}));
+pintarPlantel("todos");
+
+// Juego "¿Quién es?"
+let ok = 0, tot = 0, actual = null, resp = false;
+function mezclar(a){ a = a.slice(); for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]] = [a[j],a[i]]; } return a; }
+function nueva(){
+  resp = false;
+  actual = P[Math.floor(Math.random()*P.length)];
+  document.getElementById("j-num").textContent = actual[0];
+  document.getElementById("j-pista").textContent = `${PUESTO1[actual[2]]} · ${actual[4]}${actual[3] ? " · " + actual[3] + " años" : ""}`;
+  const mismos = P.filter(p => p !== actual && p[2] === actual[2]);
+  const otros = mezclar(mismos.length >= 3 ? mismos : P.filter(p => p !== actual)).slice(0,3);
+  const ops = mezclar([actual, ...otros]);
+  const box = document.getElementById("j-ops");
+  box.innerHTML = "";
+  ops.forEach(p => {
+    const b = document.createElement("button");
+    b.className = "op"; b.type = "button"; b.textContent = p[1];
+    b.addEventListener("click", () => {
+      if (resp) return; resp = true; tot++;
+      if (p === actual){ ok++; b.classList.add("bien"); }
+      else { b.classList.add("mal"); [...box.children].find(x => x.textContent === actual[1]).classList.add("bien"); }
+      document.getElementById("j-score").textContent = `Aciertos: ${ok} de ${tot}`;
+    });
+    box.appendChild(b);
+  });
+}
+document.getElementById("j-sig").addEventListener("click", nueva);
+nueva();
+
+// Pestañas
+const VISTAS = ["hoy","calendario","plantel","juego","titulos"];
+function mostrar(){
+  const v = VISTAS.includes(location.hash.slice(1)) ? location.hash.slice(1) : "hoy";
+  VISTAS.forEach(x => document.getElementById("v-" + x).hidden = x !== v);
+  document.querySelectorAll("nav a").forEach(a => a.dataset.v === v ? a.setAttribute("aria-current","page") : a.removeAttribute("aria-current"));
+  window.scrollTo(0,0);
+}
+window.addEventListener("hashchange", mostrar);
+mostrar();
+</script>
+
+</body>
+</html>
