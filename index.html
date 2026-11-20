@@ -150,6 +150,22 @@ a,button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .fte a,.lista a,.sub a,.det a{display:inline-block;padding:6px 0;margin:-6px 0}
 .op,.chip,.btn,nav a{-webkit-user-select:none;user-select:none}
 
+.vivo{background:#fff;color:var(--azul);border-radius:14px;padding:12px;text-align:center}
+.vivo .res{font:700 40px var(--display);line-height:1;font-variant-numeric:tabular-nums}
+.vivo .res small{font:600 15px var(--body);display:block;margin-top:4px;color:var(--fg)}
+.vivo .min{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:13px;margin-top:6px;color:var(--vivo)}
+.vivo .min .dot{background:var(--vivo)}
+@media (prefers-reduced-motion:no-preference){.vivo .min .dot{animation:late 1.2s infinite}}
+@keyframes late{50%{opacity:.25}}
+.vivo .fte{color:var(--muted);margin-top:6px}
+.h2h{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column}
+.h2h li{display:grid;grid-template-columns:48px 1fr auto;gap:2px 10px;padding:10px 0;border-bottom:1px solid var(--line);align-items:baseline}
+.h2h li:last-child{border-bottom:0}
+.h2h b{font:700 18px var(--display);color:var(--azul)}
+.h2h span{font-size:14px;font-weight:600}
+.h2h em{font-style:normal;font-size:12px;font-weight:700;border-radius:6px;padding:2px 7px;white-space:nowrap}
+.h2h em.g{background:#e3f4ea;color:#1d6b3e}.h2h em.p{background:var(--bg);color:var(--muted)}
+.h2h small{grid-column:2/-1;font-size:13px;color:var(--muted)}
 /* Mejoras 20/11: final arriba, cancha, ficha de jugador */
 .hero{background:linear-gradient(160deg,#0b2f6b 0%,#163f86 100%);color:#fff;border-radius:18px;padding:18px 16px;gap:14px;box-shadow:0 8px 24px rgba(11,47,107,.25)}
 .hero .kick{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--oro)}
@@ -241,6 +257,7 @@ a,button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
       <div class="x">vs</div>
       <div class="club"><span class="esc-rival" aria-hidden="true">CAM</span><b>Atlético Mineiro</b></div>
     </div>
+    <div id="vivo" class="vivo" hidden></div>
     <div id="estado" class="estado" hidden></div>
     <div id="cuenta" class="cuenta-hero"></div>
     <div class="horas" data-utc="2026-11-21T22:30:00Z" data-tit="Boca vs Atlético Mineiro · Final Copa Sudamericana" data-lugar="Estadio Metropolitano Roberto Meléndez, Barranquilla"><span class="hora">Sáb 21/11</span><span class="hora">Argentina 19:30</span><span class="hora">Florida 17:30</span></div>
@@ -283,6 +300,16 @@ a,button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
         </ol>
         <p class="fte">Fuente: <a href="https://eleconomista.com.ar/deportes/como-juega-figuras-atletico-mineiro-rival-boca-final-copa-sudamericana-2026-n99108" target="_blank" rel="noopener">El Economista</a> (22/10).</p>
       </div>
+    </div>
+    <div class="card">
+      <h3>Mano a mano: Boca y Mineiro ya se cruzaron 4 veces</h3>
+      <ul class="h2h">
+        <li><b>1978</b><span>Libertadores, semi</span><em class="g">Ganó Boca</em><small>2-1 en Brasil y 3-1 en la Bombonera</small></li>
+        <li><b>1993</b><span>Copa de Oro, final</span><em class="g">Campeón Boca</em><small>0-0 en Brasil y 1-0 en la Bombonera (gol de Carlos Mac Allister)</small></li>
+        <li><b>2000</b><span>Copa Mercosur, cuartos</span><em class="p">Pasó Mineiro</em><small>0-2 en Brasil y 2-2 en Buenos Aires</small></li>
+        <li><b>2021</b><span>Libertadores, octavos</span><em class="p">Pasó Mineiro</em><small>0-0 y 0-0; Mineiro ganó los penales 3-1</small></li>
+      </ul>
+      <p class="fte">En partidos (mi cuenta con esos datos): 8 jugados, Boca ganó 3, empataron 4 y Mineiro ganó 1. Fuentes: <a href="https://radionacional.co/deportes/boca-mineiro-historial-antecedentes" target="_blank" rel="noopener">Radio Nacional de Colombia</a> (17/11), <a href="https://www.cadena3.com/noticia/deportes/boca-y-atletico-mineiro-la-historia-de-su-unica-final-continental-en-1993_614360" target="_blank" rel="noopener">Cadena 3</a> (1993).</p>
     </div>
     <div class="card">
       <h3>El rival en 4 datos</h3>
@@ -726,6 +753,38 @@ function cuenta(){
     <div class="sub">${dia} · ${fmtH(prox.t)} en tu celu</div>`;
 }
 cuenta(); setInterval(cuenta, 30000);
+// Marcador en vivo de la final (datos de ESPN, se pide desde el celu cada minuto durante el partido)
+const VIVO_URL = "https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.sudamericana/scoreboard?dates=20261121";
+const ESPN_LINK = "https://espndeportes.espn.com/futbol/calendario/_/liga/conmebol.sudamericana";
+let ultimoVivo = null;
+async function enVivo(){
+  const hero = document.getElementById("hero"), box = document.getElementById("vivo");
+  if (!hero || !box) return;
+  const t = new Date(hero.dataset.utc), ahora = new Date();
+  if (ahora < t - 15*6e4 || ahora > t + 4*36e5) { box.hidden = true; return; }
+  try {
+    const r = await fetch(VIVO_URL, {cache: "no-store"});
+    const j = await r.json();
+    const ev = (j.events || []).find(e => /boca/i.test(e.name || ""));
+    const comp = ev && ev.competitions && ev.competitions[0];
+    if (!comp) throw new Error("sin partido");
+    const cs = comp.competitors || [];
+    const boca = cs.find(c => /boca/i.test(c.team && c.team.displayName || "")), riv = cs.find(c => c !== boca);
+    const st = (ev.status && ev.status.type) || {};
+    const pen = (boca && boca.shootoutScore != null && riv && riv.shootoutScore != null) ? `<small>Penales: Boca ${boca.shootoutScore} – ${riv.shootoutScore} Mineiro</small>` : "";
+    const det = st.state === "in" ? `<span class="min"><span class="dot"></span>EN VIVO · ${esc(st.shortDetail || (ev.status.displayClock || ""))}</span>`
+      : st.state === "post" ? `<span class="min" style="color:var(--azul)">Terminado</span>` : `<span class="min" style="color:var(--muted)">Todavía no empezó</span>`;
+    box.innerHTML = `<div class="res">Boca ${esc(boca.score ?? "0")} – ${esc(riv.score ?? "0")} Mineiro${pen}</div>${det}<p class="fte">Fuente: ESPN, se actualiza solo cada minuto.</p>`;
+    box.hidden = false; ultimoVivo = st.state;
+    if (st.state === "in" || st.state === "post") document.getElementById("estado").hidden = true;
+  } catch (e) {
+    if (ultimoVivo) return; // si ya mostró un marcador, lo deja
+    box.innerHTML = `<a class="agendar" style="margin:0" href="${ESPN_LINK}" target="_blank" rel="noopener">Seguilo minuto a minuto en ESPN</a>`;
+    box.hidden = false; box.style.background = "transparent";
+  }
+}
+enVivo(); setInterval(enVivo, 60000);
+
 
 // Pestañas
 const VISTAS = ["hoy","calendario","plantel","juego","titulos"];
