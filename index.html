@@ -147,6 +147,7 @@ a.jug{text-decoration:none;color:inherit}
 .marcador{gap:8px}
 .goles{font-size:48px}
 a,button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.fte a,.lista a,.sub a,.det a{display:inline-block;padding:6px 0;margin:-6px 0}
 .op,.chip,.btn,nav a{-webkit-user-select:none;user-select:none}
 
 /* Mejoras 20/11: final arriba, cancha, ficha de jugador */
@@ -588,7 +589,7 @@ function pintarPlantel(){
   const q = sinTilde((document.getElementById("buscar") || {}).value || "").trim();
   let html = "";
   for (const g of ["ARQ","DEF","MED","DEL"]){
-    if (filtro !== "todos" && filtro !== g) continue;
+    if (!q && filtro !== "todos" && filtro !== g) continue;
     const js = P.filter(p => p[2] === g && (!q || sinTilde(p[1]).includes(q) || String(p[0]) === q)).sort((a,b) => a[0]-b[0]);
     if (!js.length) continue;
     html += `<div class="grupo">${NOM[g]}</div><div class="grid">` + js.map(p => `
@@ -620,10 +621,12 @@ function ficha(n){
     ${p[5] ? `<p class="sub">${esc(p[5])}</p>` : ""}
     <a class="link" href="${ESPN(p[1])}" target="_blank" rel="noopener">Ver más fotos en Google</a>
     <button class="btn" type="button">Cerrar</button></div>`;
-  const cerrar = () => { v.remove(); document.removeEventListener("keydown", tecla); };
+  const cerrar = () => { v.remove(); document.documentElement.style.overflow = ""; document.removeEventListener("keydown", tecla); window.removeEventListener("hashchange", cerrar); };
   const tecla = e => { if (e.key === "Escape") cerrar(); };
   v.addEventListener("click", e => { if (e.target === v || e.target.classList.contains("btn")) cerrar(); });
   document.addEventListener("keydown", tecla);
+  window.addEventListener("hashchange", cerrar);
+  document.documentElement.style.overflow = "hidden";
   document.body.appendChild(v);
   v.querySelector(".btn").focus();
 }
@@ -733,6 +736,12 @@ function mostrar(){
   window.scrollTo(0,0);
 }
 window.addEventListener("hashchange", mostrar);
+let ocultaDesde = 0;
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) ocultaDesde = Date.now();
+  else if (ocultaDesde && Date.now() - ocultaDesde > 20*60e3 && navigator.onLine !== false) location.reload();
+});
+if ("serviceWorker" in navigator && location.hostname.endsWith("github.io")) navigator.serviceWorker.register("sw.js").catch(() => {});
 mostrar();
 </script>
 
